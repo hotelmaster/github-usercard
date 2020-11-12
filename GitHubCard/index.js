@@ -5,10 +5,18 @@
 */
 // store URL
 const URL = 'https://api.github.com/users/hotelmaster';
+// grab the div with 'cards' class
+const cards = document.querySelector('div.cards');
 // GET request using axios library
 axios.get(URL)
-  .then(res => {debugger})
-  .catch(err => {debugger})
+  .then(res => {
+    // call the cardMaker function and pass in an object from API
+    cards.appendChild(cardMaker(res));
+  })
+  .catch(err => {
+    alert('HA HA HA, You made an error! HA HA HA');
+  })
+
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
     github info! You will need to understand the structure of this
@@ -32,8 +40,23 @@ axios.get(URL)
     Using that array, iterate over it, requesting data for each user, creating a new card for each
     user, and adding that card to the DOM.
 */
-
-const followersArray = [];
+// array of friends
+const followersArray = ['tetondan', 'dustinmyers', 'justsml', 'luishrd', 'bigknell'];
+// url to access their data
+const URL2 = 'https://api.github.com/users/';
+// use forEach method on the followersArray
+followersArray.forEach(friend => {
+  // for each friend call axios to get their data, one by one
+  // by concatenating the URL2 with each username
+  axios.get(URL2 + friend)
+    .then(res => {
+      // still call the cardMaker function and pass in an object from API for each user
+      cards.appendChild(cardMaker(res));
+    })
+    .catch(err => {
+      alert('error! error! error!');
+    })
+})
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -64,18 +87,18 @@ function cardMaker(event) {
   const cardDiv = document.createElement('div');
   // add class
   cardDiv.classList.add('card');
+  // user image
+  const userImg = document.createElement('img');
+  // edit the src attr
+  userImg.src = event.data.avatar_url;
+  // append to card div
+  cardDiv.appendChild(userImg);
   // div holding card info
   const infoDiv= document.createElement('div');
   // add class
   infoDiv.classList.add('card-info');
   // append to card div
   cardDiv.appendChild(infoDiv);
-  // user image
-  const userImg = document.createElement('img');
-  // edit the src attr
-  userImg.src = 'https://avatars3.githubusercontent.com/u/70125650?s=460&u=338ca9dcdfdf35284d183e533e33e47f617f9791&v=4';
-  // append to card div
-  cardDiv.appendChild(userImg);
   // title with name of user
   const h3Name = document.createElement('h3');
   // add class
@@ -83,7 +106,7 @@ function cardMaker(event) {
   // append to info div
   infoDiv.appendChild(h3Name);
   // include text
-  h3Name.textContent = 'Mathew Briguglio';
+  h3Name.textContent = event.data.name;
   // p1
   const paraUN = document.createElement('p');
   // add class
@@ -91,13 +114,13 @@ function cardMaker(event) {
   // append p1 to info div
   infoDiv.appendChild(paraUN);
   // include username as text
-  paraUN.textContent = 'hotelmaster';
+  paraUN.textContent = event.data.login;
   // p2
   const paraLoc = document.createElement('p');
   // append p2 to info div
   infoDiv.appendChild(paraLoc);
   // location text
-  paraLoc.textContent = 'Riverside';
+  paraLoc.textContent = event.data.location;
   // p3
   const paraProfile = document.createElement('p');
   // append p3 to info div
@@ -105,38 +128,33 @@ function cardMaker(event) {
   // anchor element nested in p3
   const anchorGH = document.createElement('a');
   // use setAttribute method to give href to anchor
-  anchorGH.setAttribute('href', 'https://github.com/hotelmaster');
+  anchorGH.href = event.data.html_url;
   // add text
-  anchorGH.textContent = 'https://github.com/hotelmaster';
+  anchorGH.textContent = event.data.html_url;
   // append to p3
   paraProfile.appendChild(anchorGH);
   // p4
   const paraFollowers = document.createElement('p');
+  // text
+  paraFollowers.textContent = `Followers: ${event.data.followers}`;
   // append to info div
   infoDiv.appendChild(paraFollowers);
-  // text
-  paraFollowers.textContent = 'Followers: ';
   // p5
   const paraFollowing = document.createElement('p');
+  // text
+  paraFollowing.textContent = `Following: ${event.data.following}`;
   // append to info div
   infoDiv.appendChild(paraFollowing);
-  // text
-  paraFollowers.textContent = 'Following: ';
   // p6
   const paraBio = document.createElement('p');
   // append to info div
   infoDiv.appendChild(paraBio);
   // text
-  paraFollowers.textContent = 'Bio: ';
+  paraBio.textContent = event.data.bio;
 
   // return parent container for github card
   return cardDiv;
 }
-
-// grab the div with 'cards' class
-const cards = document.querySelector('div.cards');
-// call the cardMaker function and pass in an object from API
-cards.appendChild(cardMaker());
 
 /*
   List of LS Instructors Github username's:
